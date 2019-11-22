@@ -7,9 +7,14 @@
 [![Coverage](https://sonarcloud.io/api/project_badges/measure?project=org.sonar.plugins.clojure%3Asonar-clojure-plugin&metric=coverage
 )](https://sonarcloud.io/dashboard?id=org.sonar.plugins.clojure%3Asonar-clojure-plugin)
 
+## Docker image
+
+https://hub.docker.com/r/luisalexandre/sonarqube-with-pluggin-clojure
+
 ## Current State
 
 ### Features:
+* Setting a profile
 * Static code analysis powered by [eastwood](https://github.com/jonase/eastwood) and [kibit](https://github.com/jonase/kibit).
 * Detection of outdated dependencies/plugins powered by [lein-ancient](https://github.com/xsc/lein-ancient).
 * Coverage reports powered by [cloverage](https://github.com/cloverage/cloverage).
