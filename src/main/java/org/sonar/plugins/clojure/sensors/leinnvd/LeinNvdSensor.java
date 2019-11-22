@@ -6,6 +6,7 @@ import org.sonar.api.batch.sensor.SensorContext;
 import org.sonar.api.batch.sensor.SensorDescriptor;
 import org.sonar.api.batch.sensor.issue.NewIssue;
 import org.sonar.api.batch.sensor.issue.NewIssueLocation;
+import org.sonar.api.internal.apachecommons.lang.ArrayUtils;
 import org.sonar.api.rule.RuleKey;
 import org.sonar.api.utils.log.Logger;
 import org.sonar.api.utils.log.Loggers;
@@ -15,8 +16,11 @@ import org.sonar.plugins.clojure.sensors.AbstractSensor;
 import org.sonar.plugins.clojure.sensors.CommandRunner;
 import org.sonar.plugins.clojure.settings.NvdProperties;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static org.sonar.plugins.clojure.settings.NvdProperties.*;
 import static org.sonar.plugins.clojure.settings.Properties.*;
@@ -25,7 +29,7 @@ public class LeinNvdSensor extends AbstractSensor implements Sensor {
 
     private static final Logger LOG = Loggers.get(LeinNvdSensor.class);
 
-    private static final String[] LEIN_ARGUMENTS = {"nvd", "check"};
+    private static final List<String> LEIN_ARGUMENTS = Stream.of("nvd", "check").collect(Collectors.toList());
     private static final String PLUGIN_NAME = "NVD";
 
     @SuppressWarnings("WeakerAccess")
@@ -52,9 +56,15 @@ public class LeinNvdSensor extends AbstractSensor implements Sensor {
 
             String leinProfileName = context.config().get(LEIN_PROFILE_NAME_PROPERTY).orElse(null);
 
-            String leinCommand = leinProfileName != null ? String.format(LEIN_WITH_PROFILE_COMMAND, leinProfileName) : LEIN_COMMAND;
+            if (leinProfileName != null) {
 
-            this.commandRunner.run(timeOut, leinCommand, LEIN_ARGUMENTS);
+                String leinWithProfileCommand = String.format(LEIN_WITH_PROFILE_COMMAND, leinProfileName);
+
+                LEIN_ARGUMENTS.add(0 , leinWithProfileCommand);
+
+            }
+
+            this.commandRunner.run(timeOut, LEIN_COMMAND, LEIN_ARGUMENTS.toArray(new String[]{}));
 
             Optional<String> vulnerabilityContext = readFromFileSystem(reportPath);
             if (vulnerabilityContext.isPresent()) {

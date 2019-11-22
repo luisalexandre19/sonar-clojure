@@ -11,7 +11,10 @@ import org.sonar.plugins.clojure.language.ClojureLanguage;
 import org.sonar.plugins.clojure.sensors.AbstractSensor;
 import org.sonar.plugins.clojure.sensors.CommandRunner;
 
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static org.sonar.plugins.clojure.sensors.cloverage.CloverageMetricParser.parse;
 import static org.sonar.plugins.clojure.settings.CloverageProperties.*;
@@ -21,7 +24,7 @@ public class CloverageSensor extends AbstractSensor implements Sensor {
 
     private static final Logger LOG = Loggers.get(CloverageSensor.class);
     private static final String PLUGIN_NAME = "Cloverage";
-    private static final String[] LEIN_ARGUMENTS = {"cloverage", "--codecov"};
+    private static final List<String> LEIN_ARGUMENTS = Stream.of("cloverage", "--codecov").collect(Collectors.toList());
 
     @SuppressWarnings("WeakerAccess")
     public CloverageSensor(CommandRunner commandRunner) {
@@ -45,9 +48,15 @@ public class CloverageSensor extends AbstractSensor implements Sensor {
 
             String leinProfileName = context.config().get(LEIN_PROFILE_NAME_PROPERTY).orElse(null);
 
-            String leinCommand = leinProfileName != null ? String.format(LEIN_WITH_PROFILE_COMMAND, leinProfileName) : LEIN_COMMAND;
+            if (leinProfileName != null) {
 
-            this.commandRunner.run(timeOut, leinCommand, LEIN_ARGUMENTS);
+                String leinWithProfileCommand = String.format(LEIN_WITH_PROFILE_COMMAND, leinProfileName);
+
+                LEIN_ARGUMENTS.add(0 , leinWithProfileCommand);
+
+            }
+
+            this.commandRunner.run(timeOut, LEIN_COMMAND, LEIN_ARGUMENTS.toArray(new String[]{}));
 
             String reportPath = context.config().get(REPORT_LOCATION_PROPERTY).orElse(REPORT_LOCATION_DEFAULT);
             LOG.debug("Using report file: " + reportPath);

@@ -48,9 +48,9 @@ public class EastwoodSensor extends AbstractSensor implements Sensor {
 
             String leinProfileName = context.config().get(LEIN_PROFILE_NAME_PROPERTY).orElse(null);
 
-            String leinCommand = leinProfileName != null ? String.format(LEIN_WITH_PROFILE_COMMAND, leinProfileName) : LEIN_COMMAND;
+            String leinWithProfileCommand = leinProfileName != null ? String.format(LEIN_WITH_PROFILE_COMMAND, leinProfileName) : null;
 
-            CommandStreamConsumer stdOut = this.commandRunner.run(timeOut, leinCommand, EASTWOOD_COMMAND, options);
+            CommandStreamConsumer stdOut = this.commandRunner.run(timeOut, LEIN_COMMAND, leinWithProfileCommand, EASTWOOD_COMMAND, options);
 
             List<Issue> issues = EastwoodIssueParser.parse(stdOut);
             LOG.info("Saving issues " + issues.size());

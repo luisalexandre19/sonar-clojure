@@ -45,9 +45,9 @@ public class KibitSensor extends AbstractSensor implements Sensor {
 
             String leinProfileName = context.config().get(LEIN_PROFILE_NAME_PROPERTY).orElse(null);
 
-            String leinCommand = leinProfileName != null ? String.format(LEIN_WITH_PROFILE_COMMAND, leinProfileName) : LEIN_COMMAND;
+            String leinWithProfileCommand = leinProfileName != null ? String.format(LEIN_WITH_PROFILE_COMMAND, leinProfileName) : null;
 
-            CommandStreamConsumer stdOut = this.commandRunner.run(timeOut, leinCommand, KIBIT_COMMAND);
+            CommandStreamConsumer stdOut = this.commandRunner.run(timeOut, LEIN_COMMAND, leinWithProfileCommand, KIBIT_COMMAND);
 
             List<Issue> issues = KibitIssueParser.parse(stdOut);
             LOG.info("Saving issues");
